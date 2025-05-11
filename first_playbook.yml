@@ -1,0 +1,30 @@
+- hosts: clone_vm
+  become: true
+
+  tasks:
+    - name: Обновление кэша apt
+      apt:
+        update_cache: yes
+
+    - name: Установка Nginx и PHP
+      package:
+        name:
+          - nginx
+          - php-fpm
+        state: present
+    - name: Настройка Nginx
+      copy:
+        src: nginx_config
+        dest: /etc/nginx/conf.d/default
+      notify: Перезапуск Nginx
+    - name: Включение Nginx
+      service:
+        name: nginx
+        enabled: yes
+        state: started
+
+  handlers:
+    - name: Перезапуск Nginx
+      service:
+        name: nginx
+        state: restarted
